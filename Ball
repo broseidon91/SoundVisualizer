@@ -1,0 +1,126 @@
+class Ball
+{
+  AudioPlayer player;
+  float X = 0;
+  float Y = 0;
+  PVector speed;
+  PVector speedDir = new PVector(1,1);
+  float radius = 100;
+  boolean drawLines = false;
+  color waveColor;
+  int incr = 0;
+  boolean followMouse = false;
+  
+  Ball(AudioPlayer player, float X, float Y)
+  {
+    this.player = player;
+    this.X = X;
+    this.Y = Y;
+    
+  }
+
+  void draw()
+  {
+    //move the ball based on the wave
+    float avg = 0;
+    int j = 0;
+    for (int i = 0; i< player.bufferSize() - 1 && i < width; i++)
+    {
+      j = i + 1;
+      avg += player.mix.get(i);
+    }
+    avg = abs(avg / j);
+    speed = new PVector(1000 * avg, 1000 * avg);
+   //println(avg * 100);
+    ///////////
+    if (drawLines) 
+    {
+      DrawWithLines();
+      DrawWithShape();
+    }
+    else DrawWithShape();
+    if (followMouse)
+    {
+      X = mouseX;
+      Y = mouseY;
+    }
+    else
+    {
+
+      X += speed.x * speedDir.x;
+      Y += speed.y * speedDir.y;
+      WallCollision();
+    }
+    incr+= 1; 
+    if (incr > 360) incr = 0;
+  }
+
+  void DrawWithLines()
+  {
+    float sampleIncr = player.bufferSize() / 360;
+
+    for (int i = 0; i < 360; i++)
+    {
+
+      float ballRadius = 100 + player.mix.get(int(i * sampleIncr)) * 100;
+      float angle = radians(i);
+
+      float x = X + ballRadius * cos(angle);
+      float y = Y + ballRadius * sin(angle);
+      if (i + incr > 360) waveColor = color(i + (incr - 360), 255, 255); 
+      else waveColor = color(i + incr, 255, 255);
+      stroke(waveColor);
+
+      line(X, Y, x, y);
+    }
+
+    if (incr > 360) incr = 0;
+  }
+
+  void DrawWithShape()
+  {
+    float sampleIncr = player.bufferSize() / 360;
+    if (incr > 360) waveColor = color((incr - 360), 255, 255); 
+    else waveColor = color(incr, 255, 255);
+    stroke(waveColor);
+    if (!drawLines) fill(0);
+    
+    beginShape();
+    for (int i = 0; i < 360; i++)
+    {
+      float ballRadius = 100 + player.mix.get(int(i * sampleIncr)) * 100;
+      float angle = radians(i);
+
+      float x = X + ballRadius * cos(angle);
+      float y = Y + ballRadius * sin(angle);
+
+      vertex(x, y);
+      //fill(100 +player.mix.get(int(i * sampleIncr)) * 100,0,255 -(player.mix.get(int(i * sampleIncr)) * 100));
+    }
+    endShape();
+  }
+
+  void WallCollision()
+  {
+    if (X > width)
+    {
+      X = width;
+      speedDir.x = -speedDir.x;
+    }
+    if (X < 0)
+    {
+      X = 0;
+      speedDir.x = -speedDir.x;
+    }
+    if (Y > height) 
+    {
+      Y = height;
+      speedDir.y = -speedDir.y;
+    }
+    if (Y < 0)
+    {
+      Y = 0;
+      speedDir.y = -speedDir.y;
+    }
+  }
+}//End Class
