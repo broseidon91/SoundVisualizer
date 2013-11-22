@@ -1,0 +1,30 @@
+class Blob extends Ball
+{
+  float radius;
+  float radiusIntensity = 10;
+  float colorInt = 0;
+  Blob(AudioPlayer player, float X, float Y)
+  {
+    super(player, X, Y);
+    
+  }
+  
+  
+  void draw()
+  {
+    
+    stroke(255);
+    fill(colorInt, 255, 255);
+    float avg = 0;
+    int j = 0;
+    for (int i = 0; i< player.bufferSize() - 1 && i < width; i++)
+    {
+      j = i + 1;
+      avg += player.mix.get(i);
+    }
+    avg = abs(avg / j); 
+    radius = (avg * 1000) + radiusIntensity;
+    
+    ellipse(X, Y, radius, radius);
+  }
+}
