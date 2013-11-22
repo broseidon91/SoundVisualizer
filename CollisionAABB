@@ -1,0 +1,40 @@
+class CollisionAABB extends CollisionObject
+{
+
+  private float w = 0;
+  private float h = 0;
+    private float halfW = 0;
+  private float halfH = 0;
+
+
+  CollisionAABB(PVector position, float w, float h)
+  {
+    this.position = position;
+    this.w = w;
+    this.h = h;
+    halfW = w/2;
+    halfH = h/2;
+  }
+  void Draw()
+  {
+    super.Draw();
+    rect(L(), T(),w, h);
+    
+  }
+  float L() 
+  {
+    return position.x - halfW;
+  }
+  float R()
+  {
+    return position.x + halfW;
+  }
+  float T()
+  {
+    return position.y - halfH;
+  }
+  float B()
+  {
+    return position.y + halfH;
+  }
+}
