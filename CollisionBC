@@ -1,0 +1,21 @@
+class CollisionBC extends CollisionObject
+{
+ private float radius = 0;
+ private float diameter = 0;
+ 
+ 
+ CollisionBC(PVector position, float radius)
+ {
+   this.position = position;
+   this.radius = radius;
+   this.diameter = radius * 2;
+ }
+ void Draw()
+ {
+   super.Draw();
+   
+   ellipse(position.x, position.y, diameter, diameter);
+ }
+ 
+  
+}
