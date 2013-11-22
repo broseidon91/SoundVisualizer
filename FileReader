@@ -1,0 +1,16 @@
+class FileReader
+{
+  File folder;
+  File[] listOfFiles;
+  FileReader(File folder)
+  {
+    this.folder = folder;
+    listOfFiles = folder.listFiles();
+  }
+
+  public String[] getFiles()
+  {
+    
+    return folder.list();
+  }
+}
