@@ -1,0 +1,177 @@
+class Engine
+{
+  ArrayList<CollisionObject> list = new ArrayList<CollisionObject>();
+
+  void Draw()
+  {
+    for (CollisionObject obj : list)
+    {
+      obj.Draw();
+    }
+  }
+
+  void Add(CollisionObject obj)
+  {
+    list.add(obj);
+  }
+
+  void Update()
+  {
+    for (CollisionObject obj : list)
+    {
+      obj.Update();
+    }
+
+    //Collisions
+
+    for (CollisionObject one : list)
+    {
+      for (CollisionObject two : list)
+      {
+        CheckCollisions(one, two);
+        //test if one collides with two
+      }
+      one.doneChecking = true;
+    }
+  }
+  void CheckCollisions(CollisionObject one, CollisionObject two)
+  {
+    if (one.doneChecking || two.doneChecking) return;
+    if (one == two) return;
+
+    boolean collided = false;
+    if (one instanceof CollisionBC)
+    {
+      if (two instanceof CollisionBC)
+      {
+        collided = BCvsBC((CollisionBC)one, (CollisionBC)two);
+      }
+      else if (two instanceof CollisionAABB)
+      {
+        collided = AABBvsBC((CollisionAABB)two, (CollisionBC)one);
+      }
+    }
+    else if (one instanceof CollisionAABB)
+    {
+      if (two instanceof CollisionAABB)
+      {
+        collided = AABBvsAABB((CollisionAABB)one, (CollisionAABB)two);
+      }
+      else if (two instanceof CollisionBC)
+      {
+        collided = AABBvsBC((CollisionAABB)one, (CollisionBC)two);
+      }
+    }
+
+
+    if (collided) 
+    {
+      one.colliding = true;
+      two.colliding =true;
+    }
+  }
+  boolean BCvsBC(CollisionBC one, CollisionBC two)
+  {
+    float dx = two.position.x - one.position.x;
+    float dy = two.position.y - one.position.y;
+    float dis = dx*dx + dy*dy;
+    float radii = one.radius + two.radius;
+
+    if (dis <= radii * radii)
+    {
+      float overlap = radii - sqrt(dis);
+      float angle = atan2(dy, dx);
+      overlap /= 2;
+
+      float moveX = cos(angle) * overlap;
+      float moveY = sin(angle) * overlap;
+
+      one.position.x -= moveX;
+      one.position.y -= moveY;
+      
+      two.position.x += moveX;
+      two.position.y += moveY;
+
+      return true;
+    }
+    return false;
+  }
+  boolean AABBvsAABB(CollisionAABB one, CollisionAABB two)
+  {
+    //if it isnt these, then it is colliding
+    if (one.R() < two.L()) return false;
+    if (one.L() > two.R()) return false;
+    if (one.B() < two.T()) return false;
+    if (one.T() > two.B()) return false;
+    
+    float overlapL = two.L() - one.R();
+    float overlapR = two.R() - one.L();
+    float overlapT = two.T() - one.B();
+    float overlapB = two.B() - one.T();
+    
+    float overlapX = 0;
+    float overlapY = 0; 
+    
+    if (abs(overlapL) < abs(overlapR)) overlapX = overlapL;
+    else overlapX = overlapR;
+    
+    if (abs(overlapT) < abs(overlapB)) overlapY = overlapT;
+    else overlapY = overlapB;
+    
+    if (abs(overlapX) < abs(overlapY)) overlapY = 0;
+    else overlapX = 0;
+    
+    overlapX /= 2;
+    overlapY /= 2;
+    
+    one.position.x += overlapX;
+    one.position.y += overlapY;
+    
+    two.position.x -= overlapX;
+    two.position.y -= overlapY;
+    
+    return true;
+  }
+
+  boolean AABBvsBC(CollisionAABB bb, CollisionBC bc)
+  {
+    PVector p1 = bc.position.get();
+    PVector p2 = p1.get();
+
+    if (p2.x > bb.R()) p2.x = bb.R();
+    if (p2.x < bb.L()) p2.x = bb.L();
+    if (p2.y > bb.B()) p2.y = bb.B();
+    if (p2.y < bb.T()) p2.y = bb.T();
+
+    float dx = p2.x - p1.x;
+    float dy = p2.y - p1.y;
+    float dis = dx * dx + dy * dy;
+    float radius = bc.radius;
+
+
+
+
+    if  (dis <= radius * radius)
+    {
+      float overlap = radius - sqrt(dis);
+      float angle = atan2(dy, dx);
+      overlap /= 2;
+      
+      float moveX = cos(angle) * overlap;
+      float moveY = sin(angle) * overlap;
+      
+      bb.position.x += moveX;
+      bb.position.y += moveY;
+      
+      bc.position.x -= moveX;
+      bc.position.y -= moveY;
+      
+      
+      
+      return true;                 
+    }
+  return false;  
+}
+
+ 
+}
