@@ -1,0 +1,22 @@
+class Camera 
+{
+  float x = 0;
+  float y = 0;
+  PVector speed = new PVector(0,0);
+  PMatrix2D matrix = new PMatrix2D();
+  PMatrix2D tmatrix = new PMatrix2D();
+  void update()
+  {
+    x += speed.x;
+    y += speed.y;
+    speed.x *= .9;
+    speed.y *= .9;
+    matrix.reset();
+    matrix.translate(-x, -y);
+    tmatrix = matrix.get();
+    tmatrix.transpose();
+  }
+
+
+ 
+}
