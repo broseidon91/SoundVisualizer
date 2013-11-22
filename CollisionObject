@@ -1,0 +1,27 @@
+class CollisionObject
+{
+   PVector position = new PVector(0,0);
+   boolean colliding = false;
+   boolean doneChecking = false;
+   PVector speed = new PVector(0,0);
+   
+   void Draw()
+   {
+     noStroke();
+     if (colliding) fill(255,0,0);
+     else fill(255);
+     
+   }
+   
+   void Update()
+   {
+     doneChecking = false;
+     colliding = false;
+     position.x += speed.x;
+     position.y += speed.y;
+     
+     speed.x *= .9;
+     speed.y *= .9;
+   }
+ 
+}
